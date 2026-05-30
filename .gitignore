@@ -1,0 +1,13 @@
+# Archivos de credenciales y configuración local
+.env
+*.json
+!data/reglamento_unilib.pdf
+
+# Carpetas generadas por la base de datos vectorial Chroma
+chroma/
+ChromaDB/
+
+# Archivos del sistema y cachés de Python
+__pycache__/
+.pytest_cache/
+.DS_Store
