@@ -1,7 +1,5 @@
 # UNILIB: Agente Autónomo de Gestión de Biblioteca con RAG 
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tu-usuario-de-github/unilib-rag-agent/blob/main/demo_colab.ipynb)
-
 Este proyecto implementa un Agente Inteligente Autónomo basado en la arquitectura **ReAct (Reasoning and Action)** para automatizar la atención y gestión de la biblioteca institucional de **UNILIB**. El sistema integra un pipeline **RAG (Retrieval-Augmented Generation)** utilizando almacenamiento vectorial para resolver consultas normativas basándose estrictamente en el reglamento interno.
 
 #Integrante: Angela Anhuaman Solon
