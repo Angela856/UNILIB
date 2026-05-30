@@ -4,9 +4,9 @@
 
 Este proyecto implementa un Agente Inteligente Autónomo basado en la arquitectura **ReAct (Reasoning and Action)** para automatizar la atención y gestión de la biblioteca institucional de **UNILIB**. El sistema integra un pipeline **RAG (Retrieval-Augmented Generation)** utilizando almacenamiento vectorial para resolver consultas normativas basándose estrictamente en el reglamento interno.
 
----
+#Integrante: Angela Anhuaman Solon
 
-## 🧬 Arquitectura del Sistema
+##  Arquitectura del Sistema
 El agente opera en un bucle reactivo continuo que evalúa las intenciones del estudiante y decide de manera autónoma qué herramienta invocar para resolver solicitudes complejas:
 
 1. **`consultar_reglamento_y_catalogo`**: Pipeline RAG optimizado para la búsqueda semántica de normativas dentro del documento PDF del reglamento.
@@ -15,7 +15,7 @@ El agente opera en un bucle reactivo continuo que evalúa las intenciones del es
 
 ---
 
-## 🛠️ Tecnologías y Librerías (`requirements.txt`)
+##  Tecnologías y Librerías (`requirements.txt`)
 El proyecto está construido sobre un stack moderno e inmune a conflictos de versiones comunes:
 - **Orquestación:** `langchain==0.1.0` y `langchain-community`
 - **Modelo de Lenguaje (LLM):** `langchain-openai` (conectado a GPT-4o vía GitHub Models API)
@@ -25,7 +25,7 @@ El proyecto está construido sobre un stack moderno e inmune a conflictos de ver
 
 ---
 
-## 🧪 Instrucciones de Ejecución
+##  Instrucciones de Ejecución
 
 ### Opción 1: Ejecución Rápida en Google Colab 
 Para probar el agente de forma inmediata en la nube sin configurar un entorno local:
