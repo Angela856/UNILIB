@@ -1,7 +1,49 @@
 import os
 import json
 import textwrap
+import time
+import logging
+from datetime import datetime
 from google.colab import userdata
+
+# =====================================================================
+# CONFIGURACIÓN DE OBSERVABILIDAD Y TRAZABILIDAD (IE1, IE2, IE3)
+# =====================================================================
+# Configuración del Logger de auditoría para guardar texto de trazabilidad técnico
+logging.basicConfig(
+    filename='unilib_execution.log',
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s | %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
+def registrar_metricas(user_input, response, latencia, caracteres, estado, herramientas_usadas):
+    """Guarda las métricas en un archivo JSON estructurado para el Dashboard de Streamlit"""
+    log_entry = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "user_input": user_input,
+        "response": response,
+        "latency_sec": round(latencia, 2),
+        "resource_chars": caracteres,
+        "status": estado,
+        "tools_executed": tools_executed if tools_executed else ["Ninguna"]
+    }
+    
+    # Escribir en el log de auditoría clásico
+    logging.info(f"STATUS: {estado} | LATENCY: {round(latencia, 2)}s | TOOLS: {tools_executed} | INPUT: {user_input[:40]}...")
+    
+    # Escribir en el JSON acumulativo para analítica visual
+    try:
+        data = []
+        if os.path.exists("metrics_history.json"):
+            with open("metrics_history.json", "r", encoding="utf-8") as f:
+                try: data = json.load(f)
+                except: pass
+        data.append(log_entry)
+        with open("metrics_history.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        logging.error(f"Error escribiendo histórico de métricas: {str(e)}")
 
 
 # 1.) CONFIGURACIÓN DEL ENTORNO (CON VALIDACIÓN INTELIGENTE)
@@ -134,13 +176,13 @@ prompt_sistema = (
     "Cuentas con herramientas específicas para consultar el reglamento, calcular multas y reservar libros.\n"
     "Analiza la petición. Si necesitas usar una herramienta, úsala de inmediato.\n"
     "REGLA DE FORMATO CRÍTICA: Responde SIEMPRE en texto plano y corrido. "
-    "NO utilices viñetas, listas estructuradas ni Markdown en tu respuesta final."
+    "NO utilices viñetas, listas estructuradas ni Markdown in tu respuesta final."
 )
 
 
-# 5.) BUCLE REACT INTERACTIVO CON MEMORIA PERSISTENTE
+# 5.) BUCLE REACT INTERACTIVO CON MEMORIA OPTIMIZADA Y PROTOCOLOS
 
-print("\n===  AGENTE AUTÓNOMO UNILIB V2 OPERATIVO ===")
+print("\n===  AGENTE AUTÓNOMO UNILIB V3 OPERATIVO ===")
 print("Escribe tus consultas. Para terminar, escribe 'salir'.")
 
 historial_conversacion = [
@@ -155,7 +197,28 @@ while True:
     if not usuario_input.strip():
         continue
         
+    # -----------------------------------------------------------------
+    # PROTOCOLO DE SEGURIDAD Y FILTRO ÉTICO DE ENTRADA (IE6)
+    # -----------------------------------------------------------------
+    terminos_maliciosos = ["ignora", "ignore", "override", "hack", "bypass", "instrucción anterior"]
+    if any(term in usuario_input.lower() for term in terminos_maliciosos):
+        print("\n[Guardrail de Seguridad]: Consulta bloqueada por contener patrones de inyección o vulnerar el uso responsable.")
+        logging.warning(f"SECURITY_BLOCK | Intento de inyección de prompt detectado: '{usuario_input}'")
+        continue
+
+    # Iniciar conteo de latencia para el turno
+    inicio_tiempo = time.time()
+    tools_executed = []
+    
     historial_conversacion.append(HumanMessage(content=usuario_input))
+    
+    # -----------------------------------------------------------------
+    # SOSTENIBILIDAD: VENTANA DESLIZANTE DE MEMORIA (IE7)
+    # -----------------------------------------------------------------
+    # Mantenemos el mensaje de sistema inicial fijo, pero limitamos los últimos 6 mensajes 
+    # de interacción activa para que la ventana de contexto no crezca infinitamente.
+    if len(historial_conversacion) > 7:
+        historial_conversacion = [historial_conversacion[0]] + historial_conversacion[-6:]
     
     try:
         print("[Agente Pensando...]")
@@ -168,6 +231,9 @@ while True:
                 nombre_herramienta = tool_call["name"]
                 argumentos = tool_call["args"]
                 id_llamada = tool_call["id"]
+                
+                # Registrar herramienta en la trazabilidad interna
+                tools_executed.append(nombre_herramienta)
                 
                 print(f"[Acción]: Ejecutando herramienta '{nombre_herramienta}' con argumentos: {argumentos}")
                 
@@ -186,5 +252,13 @@ while True:
         respuesta_final_ajustada = textwrap.fill(respuesta_llm.content.strip(), width=110)
         print(f"\nAgente UNILIB:\n{respuesta_final_ajustada}")
         
+        # Guardar métricas de éxito (SUCCESS)
+        latencia_final = time.time() - inicio_tiempo
+        uso_recursos_chars = len(usuario_input) + len(respuesta_llm.content)
+        registrar_metricas(usuario_input, respuesta_llm.content, latencia_final, uso_recursos_chars, "SUCCESS", tools_executed)
+        
     except Exception as e:
+        # Guardar métricas de error (ERROR) para detectar cuellos de botella
+        latencia_final = time.time() - inicio_tiempo
         print(f"\n Error ha ocurrido un inconveniente: {str(e)}")
+        registrar_metricas(usuario_input, f"Error: {str(e)}", latencia_final, len(usuario_input), "ERROR", tools_executed)
