@@ -48,3 +48,26 @@ El repositorio mantiene una distribución limpia en su raíz para facilitar el d
 ├── requirements.txt       # Dependencias estrictas del proyecto
 └── metrics_history.json   # Historial estructurado de logs y métricas de ejecución
 
+## Instrucciones de Ejecución
+
+### Opción 1: Ejecución Rápida en Google Colab
+Para probar el agente de forma inmediata en la nube sin configurar un entorno local:
+
+1. Abra su cuaderno principal en Colab.
+2. En la barra lateral izquierda, haga clic en el icono de la llave (**Secretos** 🔑).
+3. Añada una nueva variable con el nombre `GITHUB_TOKEN` y pegue su credencial personal de GitHub Models. Active el interruptor de **"Acceso al cuaderno"** (Notebook access).
+4. Suba el archivo `reglamento_unilib.pdf` a la sección de archivos de Colab.
+5. Ejecute la celda del agente para interactuar en el chat. Al terminar sus pruebas, escriba **`salir`** en la consola para escribir el archivo de métricas.
+
+### Opción 2: Despliegue del Dashboard de Observabilidad
+Una vez generado el archivo `metrics_history.json`, puede levantar el panel analítico ejecutando los siguientes comandos en su entorno o celda de Colab:
+
+```bash
+# Instalación del conector seguro para entornos virtuales
+pip install pyngrok -q
+
+# Configuración del token de acceso (Reemplace con su credencial de ngrok)
+ngrok config add-authtoken TU_NGROK_AUTHTOKEN
+
+# Ejecución paralela del servicio analítico
+streamlit run dashboard.py
