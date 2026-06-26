@@ -47,7 +47,8 @@ El repositorio mantiene una distribución limpia en su raíz para facilitar el d
 ├── dashboard.py           # Panel de control analítico y auditoría en Streamlit
 ├── requirements.txt       # Dependencias estrictas del proyecto
 └── metrics_history.json   # Historial estructurado de logs y métricas de ejecución
----
+
+
 
 ## Instrucciones de Ejecución
 
